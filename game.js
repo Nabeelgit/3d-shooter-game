@@ -55,43 +55,47 @@ function createGun() {
 }
 
 function onKeyDown(event) {
-    switch (event.code) {
-        case 'KeyS':
-            moveForward = true;
-            break;
-        case 'KeyW':
-            moveBackward = true;
-            break;
-        case 'KeyD':
-            moveLeft = true;
-            break;
-        case 'KeyA':
-            moveRight = true;
-            break;
-        case 'Space':
-            if (!gameStarted) {
-                startGame();
-            } else if (document.getElementById('game-over').style.display === 'block') {
-                restartGame();
-            }
-            break;
+    if (health != 0 || event.code == "Space"){
+        switch (event.code) {
+            case 'KeyS':
+                moveForward = true;
+                break;
+            case 'KeyW':
+                moveBackward = true;
+                break;
+            case 'KeyD':
+                moveLeft = true;
+                break;
+            case 'KeyA':
+                moveRight = true;
+                break;
+            case 'Space':
+                if (!gameStarted) {
+                    startGame();
+                } else if (health == 0) {
+                    restartGame();
+                }
+                break;
+        }
     }
 }
 
 function onKeyUp(event) {
-    switch (event.code) {
-        case 'KeyS':
-            moveForward = false;
-            break;
-        case 'KeyW':
-            moveBackward = false;
-            break;
-        case 'KeyD':
-            moveLeft = false;
-            break;
-        case 'KeyA':
-            moveRight = false;
-            break;
+    if(health != 0){
+        switch (event.code) {
+            case 'KeyS':
+                moveForward = false;
+                break;
+            case 'KeyW':
+                moveBackward = false;
+                break;
+            case 'KeyD':
+                moveLeft = false;
+                break;
+            case 'KeyA':
+                moveRight = false;
+                break;
+        }
     }
 }
 
@@ -109,11 +113,30 @@ function restartGame() {
     updateHUD();
     document.getElementById('game-over').style.display = 'none';
     gameStarted = true;
+    clearZombies();
+    clearBullets();
+    resetPlayerPosition();
+    requestPointerLock();
+}
+
+function clearZombies() {
     for (const zombie of zombies) {
         scene.remove(zombie);
     }
     zombies = [];
-    requestPointerLock();
+}
+
+function clearBullets() {
+    for (const bullet of bullets) {
+        scene.remove(bullet);
+    }
+    bullets = [];
+}
+
+function resetPlayerPosition() {
+    player.position.set(0, 1.6, 0);
+    player.rotation.set(0, 0, 0);
+    camera.rotation.set(0, 0, 0);
 }
 
 function requestPointerLock() {
@@ -180,35 +203,39 @@ function updateGunPosition() {
 }
 
 function spawnZombie() {
-    const zombieGeometry = new THREE.BoxGeometry(0.6, 1.8, 0.6);
-    const zombieMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const zombie = new THREE.Mesh(zombieGeometry, zombieMaterial);
-    
-    const angle = Math.random() * Math.PI * 2;
-    const radius = 10;
-    zombie.position.set(
-        player.position.x + Math.cos(angle) * radius,
-        0.9,
-        player.position.z + Math.sin(angle) * radius
-    );
-    
-    scene.add(zombie);
-    zombies.push(zombie);
+    if (health != 0){
+        const zombieGeometry = new THREE.BoxGeometry(0.6, 1.8, 0.6);
+        const zombieMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const zombie = new THREE.Mesh(zombieGeometry, zombieMaterial);
+        
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 10;
+        zombie.position.set(
+            player.position.x + Math.cos(angle) * radius,
+            0.9,
+            player.position.z + Math.sin(angle) * radius
+        );
+        
+        scene.add(zombie);
+        zombies.push(zombie);
+    }
 }
 
 function updateZombies() {
-    const speed = 0.03;
-    for (const zombie of zombies) {
-        const direction = new THREE.Vector3()
-            .subVectors(player.position, zombie.position)
-            .normalize();
-        zombie.position.add(direction.multiplyScalar(speed));
-        
-        if (zombie.position.distanceTo(player.position) < 1) {
-            health -= 1;
-            updateHUD();
-            if (health <= 0) {
-                gameOver();
+    if (health != 0){
+        const speed = 0.03;
+        for (const zombie of zombies) {
+            const direction = new THREE.Vector3()
+                .subVectors(player.position, zombie.position)
+                .normalize();
+            zombie.position.add(direction.multiplyScalar(speed));
+            
+            if (zombie.position.distanceTo(player.position) < 1) {
+                health -= 1;
+                updateHUD();
+                if (health <= 0) {
+                    gameOver();
+                }
             }
         }
     }
@@ -261,9 +288,9 @@ function updateHUD() {
 }
 
 function gameOver() {
-    gameStarted = false;
+    clearZombies();
     document.getElementById('game-over').style.display = 'block';
-    document.exitPointerLock();
+     // Add this line to clear zombies when the game is over
 }
 
 init();
