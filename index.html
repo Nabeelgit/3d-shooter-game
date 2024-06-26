@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Zombie Shooter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="start-screen">
+            <h1>3D Zombie Shooter</h1>
+            <p>Press SPACEBAR to start</p>
+            <p>Use WASD to move, mouse to aim, click to shoot</p>
+        </div>
+        <div id="hud" style="display: none;">
+            <div id="health">Health: <span id="health-value">100</span></div>
+            <div id="score">Score: <span id="score-value">0</span></div>
+        </div>
+        <div id="crosshair" style="display: none;">+</div>
+        <div id="game-over" style="display: none;">
+            <h2>Game Over</h2>
+            <p>Press SPACEBAR to restart</p>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
